@@ -58,29 +58,39 @@ class HomeController extends GetxController {
   Future<void> refreshDeals() async {
     _page = 1;
     final res = await dealRepo.fetchDeals(page: 1);
+    if (isClosed) return;
+
     _totalPages = res.totalPages;
     deals.assignAll(res.items);
     refreshController.refreshCompleted();
   }
 
   Future<void> loadMore() async {
-    if (_isFetchingMore) return;
+    if (refreshController.isRefresh || _isFetchingMore) {
+      refreshController.loadComplete();
+      return;
+    }
     if (!hasMore) {
       refreshController.loadNoData();
       return;
     }
     _isFetchingMore = true;
-    _page++;
+    final loadedPage = ++_page;
     try {
       final res = await dealRepo.fetchDeals(page: _page);
+      if (_page != loadedPage || isClosed) return;
+
       _totalPages = res.totalPages;
       deals.addAll(res.items);
     } catch (e) {
       LogService.error('loadMore failed', e);
       _page--;
+    } finally {
+      if (!isClosed) {
+        _isFetchingMore = false;
+        refreshController.loadComplete();
+      }
     }
-    _isFetchingMore = false;
-    refreshController.loadComplete();
   }
 
   void scrollToTop() {
