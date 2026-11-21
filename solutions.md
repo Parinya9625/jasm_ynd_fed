@@ -73,3 +73,19 @@ In `the_network_image.dart` file, I set `memCacheHeight` scaled by `.devicePixel
 | Before | After |
 |:--:|:--:|
 |![RC3 Before](./assets/solutions/RES-105-3B.png)|![RC3 After](./assets/solutions/RES-105-3A.png)|
+
+## RES-106 · Wrong pickup times; "Pickup today" filter misses deals
+
+### Time Spent: 30 mins
+
+### Root Cause
+In `pickup_window_model.dart`, `start` and `end` variables are parsed ISO-8601 UTC string, so timezone stays in UTC
+- `.label` formatted `start` and `end` without converting to user local time, which showed wrong pickup time on cards
+- `.isToday` compared `start.day` (in UTC) with `DateTime.now().day` (in Local Time), and only checked `.day` instead of full date (`year`, `month`, `day`). Because of timezone shift and only checking day, stores with pickup today were filtered out when "Pickup today" was turned on.
+- `.isOpenNow` used `now.isAfter(start)`, which excluded the exact opening time.
+
+### Solution
+In `pickup_window_model.dart`, I updated getters to use local time instead of UTC for display and time check:
+- In `.label`, converted `start.toLocal()` and `end.toLocal()` before formatting with `DateFormat()`
+- In `.isToday`, converted `start.toLocal()` and compared `year`, `month` and `day` against `DateTime.now()` so filtering works accurately
+- In `.isOpenNow`, changed `now.isAfter(start)` to `!now.isBefore(start)` so the start time is inclusive.
