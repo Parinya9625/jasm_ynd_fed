@@ -20,7 +20,7 @@ In `PickupCountdown` widget, inside `initState()` there is a timer that keep run
 ### Solution
 Make sure timer got dispose by created new variable that store that timer and inside `dispose()` method, then call `_timer?.cancel()` to stop timer from running. and for safety, I add `mounted` condition check to prevent widget to call setState even if the widget is disposed.
 
-### RES-103 · Requests pile up the longer you browse
+## RES-103 · Requests pile up the longer you browse
 
 ### Time Spent: 20 mins
 
@@ -30,7 +30,7 @@ When user navigate to `DealDetailsScreen` page, it will get `DealDetailsControll
 ### Solution
 in `deal_details_controller.dart` file, I add variable to store `ever()` worker and after that I call `.dispose()` inside `onClose()` method to make this worker got disposed when controller is also closed. And I also add check inside `_recheckAvailability()` method by adding `isClosed` condition to prevent results from `dealRepo.fetchById()` to update value when controller already disposed.
 
-### RES-104 · Duplicate deals in the home feed
+## RES-104 · Duplicate deals in the home feed
 
 ### Time Spent: 1 hour
 
@@ -40,12 +40,36 @@ When user try to load more page data. it will call `loadMore()` method and when 
 ### Solution
 in `home_controller.dart` file, I add variable `loadedPage` to keep track which page each request belongs to. if `_page` does not match `loadedPage` variable, the response is outdated and should be ignored. and I add guard condition like `isClosed` and `refreshController.isRefresh` to prevent duplicate data from being added and prevent update data when controller is disposed.
 
-### RES-105 · Home feed is janky and memory keeps climbing
+## RES-105 · Home feed is janky and memory keeps climbing
 
-### Time Spent: 
-### Root Cause
-### Solution
+### Time Spent: 5 hours
 
-1: Root Obx -> Extract to mini Obx | Reduce rebuild, more jank
-2: Move scroll offset check in build out to controller | Reduce more rebuild, less jank
-3: Oversized image in card -> use memCacheHeight with dpr | Reduce image decoding
+### Root Cause 1
+in `HomeScreen` widget, it have root `Obx` widget and it cause wide rebuild. that make everytime user scroll it have cause a lot of jank because value of scroll offset and other `.obs` is consistently updated.
+
+### Solution 1
+in `home_screen.dart` file. I extracted root `Obx` widget into smaller `Obx` widget and only wrap around part of widget that need to listen to controller. this reduce rebuild a lot but still have jank
+
+| Before | After |
+|:--:|:--:|
+|![RC1 Before](./assets/solutions/RES-105-1B.png)|![RC1 After](./assets/solutions/RES-105-1A.png)|
+
+### Root Cause 2
+Updating and checking scroll offset just to show "AppBar elevation" and "FAB scroll to top" added extra work and caused a lot of jank because `Obx` consistently updated on every scroll change
+
+### Solution 2
+Remove variable `scrollOffset` and replace with `showAppBarElevation` and `showFABScrollToTop` that only store `true` and `false`. Inside `_onScroll()` method, changed from assigning the offset value to variable to having condition check inside controller and only set boolean value to it. that make `Obx` on HomeScreen update only when actually needed.
+
+| Before | After |
+|:--:|:--:|
+|![RC1 After](./assets/solutions/RES-105-1A.png)|![RC2 After](./assets/solutions/RES-105-2A.png)|
+
+### Root Cause 3
+Image in cards can be oversized compared to the card slot, so decoding them at full size adds extra image decoding and memory work
+
+### Solution 3
+In `the_network_image.dart` file, I set `memCacheHeight` scaled by `.devicePixelRatio` so Flutter decodes and caches a smaller size in memory instead of full resolution. This help reduce image decoding and memory load.
+
+| Before | After |
+|:--:|:--:|
+|![RC3 Before](./assets/solutions/RES-105-3B.png)|![RC3 After](./assets/solutions/RES-105-3A.png)|
