@@ -46,5 +46,6 @@ in `home_controller.dart` file, I add variable `loadedPage` to keep track which 
 ### Root Cause
 ### Solution
 
-A: Root Obx -> Extract to mini Obx | Reduce rebuild, more jank
-B: Move scroll offset check in build out to controller | Reduce more rebuild, less jank
+1: Root Obx -> Extract to mini Obx | Reduce rebuild, more jank
+2: Move scroll offset check in build out to controller | Reduce more rebuild, less jank
+3: Oversized image in card -> use memCacheHeight with dpr | Reduce image decoding
