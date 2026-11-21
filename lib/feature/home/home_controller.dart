@@ -15,10 +15,14 @@ class HomeController extends GetxController {
   final flashDeals = <DealModel>[].obs;
   final isLoading = true.obs;
   final todayOnly = false.obs;
-  final scrollOffset = 0.0.obs;
 
   final scrollController = ScrollController();
   final refreshController = RefreshController();
+
+  final showAppBarElevation = false.obs;
+  final showFABScrollToTop = false.obs;
+  final _showAppBarElevationThreshold = 4;
+  final _showFABScrollToTopThreshold = 800;
 
   int _page = 1;
   int _totalPages = 1;
@@ -26,9 +30,8 @@ class HomeController extends GetxController {
 
   bool get hasMore => _page < _totalPages;
 
-  List<DealModel> get visibleDeals => todayOnly.value
-      ? deals.where((d) => d.pickupWindow.isToday).toList()
-      : deals.toList();
+  List<DealModel> get visibleDeals =>
+      todayOnly.value ? deals.where((d) => d.pickupWindow.isToday).toList() : deals.toList();
 
   @override
   void onInit() {
@@ -38,7 +41,8 @@ class HomeController extends GetxController {
   }
 
   void _onScroll() {
-    scrollOffset.value = scrollController.offset;
+    showAppBarElevation.value = scrollController.offset > _showAppBarElevationThreshold;
+    showFABScrollToTop.value = scrollController.offset > _showFABScrollToTopThreshold;
   }
 
   Future<void> _initialLoad() async {
@@ -94,8 +98,7 @@ class HomeController extends GetxController {
   }
 
   void scrollToTop() {
-    scrollController.animateTo(0,
-        duration: const Duration(milliseconds: 400), curve: Curves.easeOut);
+    scrollController.animateTo(0, duration: const Duration(milliseconds: 400), curve: Curves.easeOut);
   }
 
   @override

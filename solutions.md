@@ -47,3 +47,4 @@ in `home_controller.dart` file, I add variable `loadedPage` to keep track which 
 ### Solution
 
 A: Root Obx -> Extract to mini Obx | Reduce rebuild, more jank
+B: Move scroll offset check in build out to controller | Reduce more rebuild, less jank

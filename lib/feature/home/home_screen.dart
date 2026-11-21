@@ -19,7 +19,7 @@ class HomeScreen extends GetView<HomeController> {
       appBar: ObxPreferredSizeWidget(
         builder: () {
           return AppBar(
-            elevation: controller.scrollOffset.value > 4 ? 2 : 0,
+            elevation: controller.showAppBarElevation.value ? 2 : 0,
             shadowColor: Colors.black26,
             title: const Row(
               children: [
@@ -101,7 +101,7 @@ class HomeScreen extends GetView<HomeController> {
         );
       }),
       floatingActionButton: Obx(() {
-        if (controller.scrollOffset.value <= 800) return SizedBox.shrink();
+        if (controller.showFABScrollToTop.value) return SizedBox.shrink();
 
         return FloatingActionButton.small(
           onPressed: controller.scrollToTop,
