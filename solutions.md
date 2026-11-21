@@ -39,3 +39,11 @@ When user try to load more page data. it will call `loadMore()` method and when 
 
 ### Solution
 in `home_controller.dart` file, I add variable `loadedPage` to keep track which page each request belongs to. if `_page` does not match `loadedPage` variable, the response is outdated and should be ignored. and I add guard condition like `isClosed` and `refreshController.isRefresh` to prevent duplicate data from being added and prevent update data when controller is disposed.
+
+### RES-105 · Home feed is janky and memory keeps climbing
+
+### Time Spent: 
+### Root Cause
+### Solution
+
+A: Root Obx -> Extract to mini Obx | Reduce rebuild, more jank
