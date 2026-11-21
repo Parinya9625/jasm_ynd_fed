@@ -101,7 +101,7 @@ class HomeScreen extends GetView<HomeController> {
         );
       }),
       floatingActionButton: Obx(() {
-        if (controller.showFABScrollToTop.value) return SizedBox.shrink();
+        if (!controller.showFABScrollToTop.value) return SizedBox.shrink();
 
         return FloatingActionButton.small(
           onPressed: controller.scrollToTop,
