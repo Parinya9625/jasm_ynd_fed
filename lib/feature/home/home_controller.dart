@@ -67,6 +67,7 @@ class HomeController extends GetxController {
     _totalPages = res.totalPages;
     deals.assignAll(res.items);
     refreshController.refreshCompleted();
+    refreshController.resetNoData();
   }
 
   Future<void> loadMore() async {
