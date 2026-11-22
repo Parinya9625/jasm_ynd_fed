@@ -89,3 +89,13 @@ In `pickup_window_model.dart`, I updated getters to use local time instead of UT
 - In `.label`, converted `start.toLocal()` and `end.toLocal()` before formatting with `DateFormat()`
 - In `.isToday`, converted `start.toLocal()` and compared `year`, `month` and `day` against `DateTime.now()` so filtering works accurately
 - In `.isOpenNow`, changed `now.isAfter(start)` to `!now.isBefore(start)` so the start time is inclusive.
+
+## RES-107 · Deep link opens to a crash
+
+### Time Spent: 4 hours
+
+### Root Cause
+When open deal detail page via deep link, `Get.arguments` does not contain a `DealModel` object like normal in-app navigation does. And when `DealDetailsController` tries to cast `Get.arguments as DealModel` while `Get.arguments` is `null`, the app crashes.
+
+### Solution
+In `deal_details_controller.dart` file, I updated `DealDetailsController.onInit()` method by extract initialization code into new  `_prepareDeal()` method with safe type checking. It will check if `Get.argumentns` is `DealModel`, use it directly and continue normal flow. Otherwise try to parse deal ID from `Get.parameters["id"]` and fetch deal data via `dealRepo.fetchById()` and use return result to display to user. And I also added loading state while fetching deal so user knows page is still loading and not broken.

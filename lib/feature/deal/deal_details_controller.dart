@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:rescu/routes/routes.dart';
 
 import '../../model/deal_model.dart';
 import '../../repository/deal_repo.dart';
@@ -6,7 +7,7 @@ import '../../service/analytics_service.dart';
 import '../../service/cart_service.dart';
 import '../../util/log_service.dart';
 
-class DealDetailsController extends GetxController {
+class DealDetailsController extends GetxController with StateMixin<DealModel> {
   final DealRepo dealRepo;
   final CartService cartService;
   final AnalyticsService analytics;
@@ -25,9 +26,38 @@ class DealDetailsController extends GetxController {
   Worker? _recheckWorker;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    deal = Get.arguments as DealModel;
+    await _prepareDeal();
+  }
+
+  @override
+  void onClose() {
+    _recheckWorker?.dispose();
+    super.onClose();
+  }
+
+  Future<void> _prepareDeal() async {
+    change(null, status: RxStatus.loading());
+
+    if (Get.arguments case DealModel arg) {
+      deal = arg;
+      change(deal, status: RxStatus.success());
+    } else {
+      final id = int.tryParse(Get.parameters["id"] ?? "");
+      if (id == null) return change(null, status: RxStatus.error("invalid deal id"));
+
+      try {
+        deal = await dealRepo.fetchById(id);
+        if (isClosed) return;
+
+        change(deal, status: RxStatus.success());
+      } catch (e) {
+        if (isClosed) return;
+        return change(null, status: RxStatus.error(e.toString()));
+      }
+    }
+
     _quantityLeft.value = deal.quantityLeft;
     analytics.logEvent('deal_details_view', {
       'deal_id': deal.id,
@@ -38,17 +68,11 @@ class DealDetailsController extends GetxController {
     _recheckWorker = ever(cartService.itemCount, (_) => _recheckAvailability());
   }
 
-  @override
-  void onClose() {
-    _recheckWorker?.dispose();
-    super.onClose();
-  }
-
   Future<void> _recheckAvailability() async {
     LogService.log('re-checking availability for deal ${deal.id}');
     final fresh = await dealRepo.fetchById(deal.id);
     if (isClosed) return;
-    
+
     _quantityLeft.value = fresh.quantityLeft;
   }
 
@@ -60,5 +84,13 @@ class DealDetailsController extends GetxController {
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
+  }
+
+  void safeGoBack() {
+    if (Get.key.currentState?.canPop() ?? false) {
+      Get.back();
+    } else {
+      Get.offAllNamed(Routes.home);
+    }
   }
 }
