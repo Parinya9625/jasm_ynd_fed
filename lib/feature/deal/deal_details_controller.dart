@@ -69,9 +69,7 @@ class DealDetailsController extends GetxController with StateMixin<DealModel> {
     // details screen never shows stale availability.
     _recheckWorker = ever(cartService.itemCount, (_) => _recheckAvailability());
 
-    if (deal.flashSaleEndsAt case DateTime endAt) {
-      isDealExpired.value = !DateTime.now().isBefore(endAt);
-    }
+    isDealExpired.value = deal.isFlashSaleExpired;
   }
 
   Future<void> _recheckAvailability() async {

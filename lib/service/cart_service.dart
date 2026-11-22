@@ -11,8 +11,25 @@ import '../util/log_service.dart';
 class CartService extends GetxService {
   final items = <CartItemModel>[].obs;
   final itemCount = 0.obs;
+  int _lastExpiredItemCount = 0;
+
+  List<CartItemModel> get activeItems {
+    return items.where((i) => !i.isExpired).toList();
+  }
+
+  List<CartItemModel> get expiredItems {
+    return items.where((i) => i.isExpired).toList();
+  }
+
+  bool get hasExpiredItems => expiredItems.isNotEmpty;
+
+  bool get isExpiredItemChanged {
+    return expiredItems.length != _lastExpiredItemCount;
+  }
 
   void add(DealModel deal) {
+    if (deal.isFlashSaleExpired) return;
+
     final existing = items.firstWhereOrNull((i) => i.deal.id == deal.id);
     if (existing != null) {
       if (existing.quantity >= deal.quantityLeft) {
@@ -49,9 +66,25 @@ class CartService extends GetxService {
     _recount();
   }
 
-  num get total => items.fold(0, (sum, i) => sum + i.lineTotal);
+  void clearActive() {
+    items.removeWhere((i) => !i.isExpired);
+    _recount();
+  }
+
+  void clearExpired() {
+    items.removeWhere((i) => i.isExpired);
+    _recount();
+  }
+
+  void refresh() {
+    items.refresh();
+    _recount();
+  }
+
+  num get total => activeItems.fold(0, (sum, i) => sum + i.lineTotal);
 
   void _recount() {
-    itemCount.value = items.fold(0, (sum, i) => sum + i.quantity);
+    itemCount.value = activeItems.fold(0, (sum, i) => sum + i.quantity);
+    _lastExpiredItemCount = expiredItems.length;
   }
 }

@@ -12,4 +12,8 @@ class CartItemModel {
   CartItemModel({required this.deal, this.quantity = 1, this.reservation});
 
   num get lineTotal => deal.price * quantity;
+
+  bool get isExpired {
+    return deal.isFlashSaleExpired;
+  }
 }

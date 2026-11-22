@@ -65,7 +65,6 @@ class DealDetailsScreen extends GetView<DealDetailsController> {
                               const SizedBox(width: 8),
                               FlashSaleDealCountdown(
                                 deal: deal,
-                                scope: "deal_detail",
                                 onExpired: controller.onFlashSaleExpired,
                               ),
                             ],

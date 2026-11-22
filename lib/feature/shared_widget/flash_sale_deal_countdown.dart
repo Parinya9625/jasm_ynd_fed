@@ -7,12 +7,10 @@ class FlashSaleDealCountdown extends StatefulWidget {
   const FlashSaleDealCountdown({
     super.key,
     required this.deal,
-    required this.scope,
     this.onExpired,
   });
 
   final DealModel deal;
-  final String scope;
   final Function()? onExpired;
 
   @override
@@ -20,9 +18,7 @@ class FlashSaleDealCountdown extends StatefulWidget {
 }
 
 class _FlashSaleDealCountdownState extends State<FlashSaleDealCountdown> {
-  late CountdownController _controller;
-
-  String get _tag => "fsd_${widget.scope}_${widget.deal.id}";
+  late final CountdownController _controller;
 
   @override
   void initState() {
@@ -31,26 +27,23 @@ class _FlashSaleDealCountdownState extends State<FlashSaleDealCountdown> {
   }
 
   @override
-  void didUpdateWidget(covariant FlashSaleDealCountdown oldWidget) {
+  void didUpdateWidget(FlashSaleDealCountdown oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.deal.id != widget.deal.id) {
-      final oldTag = "fsd_${oldWidget.deal.id}";
-      Get.delete<CountdownController>(tag: oldTag);
-      _setupController();
-    } else if (oldWidget.deal.flashSaleEndsAt != widget.deal.flashSaleEndsAt) {
+    _controller.setOnExpiredTrigger(widget.onExpired);
+    if (oldWidget.deal.id != widget.deal.id || oldWidget.deal.flashSaleEndsAt != widget.deal.flashSaleEndsAt) {
       _syncTimer();
     }
   }
 
   @override
   void dispose() {
-    Get.delete<CountdownController>(tag: _tag);
+    _controller.onClose();
     super.dispose();
   }
 
   void _setupController() {
-    _controller = Get.put(CountdownController(), tag: _tag);
+    _controller = CountdownController()..onInit();
     _controller.setOnExpiredTrigger(widget.onExpired);
     _syncTimer();
   }

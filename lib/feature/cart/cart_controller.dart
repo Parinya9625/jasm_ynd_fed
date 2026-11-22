@@ -13,12 +13,37 @@ class CartController extends GetxController {
 
   final isCheckingOut = false.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    cartService.refresh();
+  }
+
   Future<void> checkout() async {
-    if (cartService.items.isEmpty || isCheckingOut.value) return;
+    if (isCheckingOut.value) return;
+
+    if (cartService.isExpiredItemChanged) {
+      isCheckingOut.value = true;
+      await Future.delayed(Duration(milliseconds: 500), () {
+        cartService.refresh();
+      });
+      if (isClosed) return;
+      isCheckingOut.value = false;
+
+      Get.snackbar(
+        "Warning",
+        "Some item has been expired",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (cartService.activeItems.isEmpty) return;
+
     isCheckingOut.value = true;
     try {
-      final order = await orderRepo.checkout(cartService.items.toList());
-      cartService.clear();
+      final order = await orderRepo.checkout(cartService.activeItems.toList());
+      cartService.clearActive();
       Get.snackbar(
         'Order confirmed',
         'Order #${order.id} — pick up soon!',
@@ -31,7 +56,10 @@ class CartController extends GetxController {
         e.message,
         snackPosition: SnackPosition.BOTTOM,
       );
+    } finally {
+      if (!isClosed) {
+        isCheckingOut.value = false;
+      }
     }
-    isCheckingOut.value = false;
   }
 }

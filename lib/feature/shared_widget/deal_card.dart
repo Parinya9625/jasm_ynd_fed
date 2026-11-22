@@ -37,8 +37,7 @@ class _DealCardState extends State<DealCard> {
   }
 
   bool _checkExpired() {
-    final endAt = widget.deal.flashSaleEndsAt;
-    return endAt != null && !DateTime.now().isBefore(endAt);
+    return widget.deal.isFlashSaleExpired;
   }
 
   void _onCountdownExpired() {
@@ -160,7 +159,6 @@ class _DealCardState extends State<DealCard> {
                           const SizedBox(width: 8),
                           FlashSaleDealCountdown(
                             deal: widget.deal,
-                            scope: "deal_card",
                             onExpired: _onCountdownExpired,
                           ),
                         ],
