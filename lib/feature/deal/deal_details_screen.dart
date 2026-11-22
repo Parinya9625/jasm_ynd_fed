@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rescu/binding/deal_details_binding.dart';
 import 'package:rescu/feature/deal/deal_not_found_screen.dart';
+import 'package:rescu/feature/shared_widget/flash_sale_deal_countdown.dart';
 import 'package:rescu/routes/routes.dart';
 
 import '../../app_config.dart';
@@ -60,6 +61,10 @@ class DealDetailsScreen extends GetView<DealDetailsController> {
                             Text('฿${deal.originalPrice.toStringAsFixed(0)}',
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.grey.shade500, decoration: TextDecoration.lineThrough)),
+                            if (deal.isFlashSale) ...[
+                              const SizedBox(width: 8),
+                              FlashSaleDealCountdown(deal: deal, scope: "deal_detail"),
+                            ],
                             const Spacer(),
                             Obx(() => Chip(
                                   avatar: const Icon(Icons.inventory_2_outlined, size: 16),

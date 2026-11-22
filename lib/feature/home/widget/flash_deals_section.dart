@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rescu/feature/shared_widget/flash_sale_deal_countdown.dart';
 
 import '../../../app_config.dart';
 import '../../../model/deal_model.dart';
@@ -26,8 +27,7 @@ class FlashDealsSection extends StatelessWidget {
             children: [
               Icon(Icons.bolt, color: Colors.red, size: 20),
               SizedBox(width: 4),
-              Text('Flash sales',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+              Text('Flash sales', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -54,10 +54,7 @@ class FlashDealsSection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TheNetworkImage(
-                            url: deal.imageUrl,
-                            height: 90,
-                            width: double.infinity),
+                        TheNetworkImage(url: deal.imageUrl, height: 90, width: double.infinity),
                         Padding(
                           padding: const EdgeInsets.all(8),
                           child: Column(
@@ -66,35 +63,21 @@ class FlashDealsSection extends StatelessWidget {
                               Text(deal.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600)),
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                               Text(deal.storeName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      fontSize: 11.5,
-                                      color: Colors.grey.shade600)),
+                                  style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
                               const SizedBox(height: 6),
                               Row(
                                 children: [
                                   Text('฿${deal.price.toStringAsFixed(0)}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppConfig.primaryGreen)),
+                                      style:
+                                          const TextStyle(fontWeight: FontWeight.bold, color: AppConfig.primaryGreen)),
                                   const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.shade50,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text('Ends soon',
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.red.shade700)),
+                                  FlashSaleDealCountdown(
+                                    deal: deal,
+                                    scope: "flash_rail",
                                   ),
                                 ],
                               ),
