@@ -8,10 +8,12 @@ class FlashSaleDealCountdown extends StatefulWidget {
     super.key,
     required this.deal,
     required this.scope,
+    this.onExpired,
   });
 
   final DealModel deal;
   final String scope;
+  final Function()? onExpired;
 
   @override
   State<FlashSaleDealCountdown> createState() => _FlashSaleDealCountdownState();
@@ -49,6 +51,7 @@ class _FlashSaleDealCountdownState extends State<FlashSaleDealCountdown> {
 
   void _setupController() {
     _controller = Get.put(CountdownController(), tag: _tag);
+    _controller.setOnExpiredTrigger(widget.onExpired);
     _syncTimer();
   }
 

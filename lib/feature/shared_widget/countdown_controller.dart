@@ -5,9 +5,18 @@ import 'package:get/get.dart';
 class CountdownController extends GetxController {
   Timer? _timer;
   DateTime? _endAt;
+  Function()? _onExpired;
+  Worker? _expiredWorker;
 
   final text = "00:00".obs;
   final isExpired = true.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    _expiredWorker = ever<bool>(isExpired, _onExpireUpdate);
+  }
 
   void start(DateTime endAt) {
     // NOTE: prevent restart if rebuild with same datetime
@@ -45,6 +54,10 @@ class CountdownController extends GetxController {
     _endAt = null;
   }
 
+  void setOnExpiredTrigger(Function()? onExpired) {
+    _onExpired = onExpired;
+  }
+
   void _updateRemaining(Duration duration) {
     isExpired.value = duration <= Duration.zero;
 
@@ -60,8 +73,15 @@ class CountdownController extends GetxController {
     text.value = "$m:$s";
   }
 
+  void _onExpireUpdate(bool isExpired) {
+    if (isExpired && !isClosed) {
+      _onExpired?.call();
+    }
+  }
+
   @override
   void onClose() {
+    _expiredWorker?.dispose();
     _timer?.cancel();
     super.onClose();
   }

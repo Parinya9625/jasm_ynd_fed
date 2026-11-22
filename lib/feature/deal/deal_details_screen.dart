@@ -63,7 +63,11 @@ class DealDetailsScreen extends GetView<DealDetailsController> {
                                     fontSize: 16, color: Colors.grey.shade500, decoration: TextDecoration.lineThrough)),
                             if (deal.isFlashSale) ...[
                               const SizedBox(width: 8),
-                              FlashSaleDealCountdown(deal: deal, scope: "deal_detail"),
+                              FlashSaleDealCountdown(
+                                deal: deal,
+                                scope: "deal_detail",
+                                onExpired: controller.onFlashSaleExpired,
+                              ),
                             ],
                             const Spacer(),
                             Obx(() => Chip(
@@ -133,11 +137,15 @@ class DealDetailsScreen extends GetView<DealDetailsController> {
               color: Colors.white,
               child: SizedBox(
                 width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: controller.addToCart,
-                  icon: const Icon(Icons.add_shopping_cart),
-                  label: const Text('Add to bag'),
-                ),
+                child: Obx(() {
+                  final expired = controller.isDealExpired.value;
+
+                  return FilledButton.icon(
+                    onPressed: expired ? null : controller.addToCart,
+                    icon: expired ? null : const Icon(Icons.add_shopping_cart),
+                    label: Text(expired ? "Deal Expired" : 'Add to bag'),
+                  );
+                }),
               ),
             ),
           );

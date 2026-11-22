@@ -12,6 +12,8 @@ class DealDetailsController extends GetxController with StateMixin<DealModel> {
   final CartService cartService;
   final AnalyticsService analytics;
 
+  final isDealExpired = false.obs;
+
   DealDetailsController({
     required this.dealRepo,
     required this.cartService,
@@ -66,6 +68,10 @@ class DealDetailsController extends GetxController with StateMixin<DealModel> {
     // Whenever the cart changes, re-check this deal's remaining stock so the
     // details screen never shows stale availability.
     _recheckWorker = ever(cartService.itemCount, (_) => _recheckAvailability());
+
+    if (deal.flashSaleEndsAt case DateTime endAt) {
+      isDealExpired.value = !DateTime.now().isBefore(endAt);
+    }
   }
 
   Future<void> _recheckAvailability() async {
@@ -84,6 +90,10 @@ class DealDetailsController extends GetxController with StateMixin<DealModel> {
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
+  }
+
+  void onFlashSaleExpired() {
+    isDealExpired.value = true;
   }
 
   void safeGoBack() {
