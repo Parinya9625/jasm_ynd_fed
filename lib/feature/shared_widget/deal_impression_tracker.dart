@@ -24,7 +24,24 @@ class DealImpressionTracker extends StatefulWidget {
 }
 
 class _DealImpressionTrackerState extends State<DealImpressionTracker> {
+  late Key _detectorKey;
   Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _detectorKey = _createKey();
+  }
+
+  @override
+  void didUpdateWidget(DealImpressionTracker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.id != widget.id || oldWidget.source != widget.source) {
+      _detectorKey = _createKey();
+      _stopTimer();
+    }
+  }
 
   @override
   void dispose() {
@@ -34,10 +51,8 @@ class _DealImpressionTrackerState extends State<DealImpressionTracker> {
 
   @override
   Widget build(BuildContext context) {
-    final key = ValueKey('impression_deal_${widget.id}_${widget.source.name}_${widget.position}');
-
     return VisibilityDetector(
-      key: key,
+      key: _detectorKey,
       onVisibilityChanged: (info) {
         if (info.visibleFraction >= 0.5) {
           _startTimer();
@@ -49,10 +64,17 @@ class _DealImpressionTrackerState extends State<DealImpressionTracker> {
     );
   }
 
+  Key _createKey() {
+    return ValueKey('impression_deal_${widget.id}_${widget.source.name}');
+  }
+
   void _startTimer() {
     if (_timer != null) return;
 
     _timer = Timer(const Duration(seconds: 1), () {
+      _timer = null;
+      if (!mounted) return;
+
       Get.find<AnalyticsService>().logDealImpression(
         DealImpressionEvent(
           id: widget.id,
