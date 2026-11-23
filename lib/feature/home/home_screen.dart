@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:rescu/feature/shared_widget/deal_impression_tracker.dart';
 import 'package:rescu/feature/shared_widget/obx_preferred_size_widget.dart';
 
 import '../../app_config.dart';
@@ -94,7 +95,18 @@ class HomeScreen extends GetView<HomeController> {
                   ],
                 ),
               ),
-              ...controller.visibleDeals.map((deal) => DealCard(deal: deal)),
+              ...controller.visibleDeals.map((deal) {
+                final index = controller.visibleDeals.indexOf(deal);
+
+                return DealImpressionTracker(
+                  id: deal.id,
+                  position: index,
+                  source: controller.todayOnly.value ? ImpressionSource.homePickToday : ImpressionSource.home,
+                  child: DealCard(
+                    deal: deal,
+                  ),
+                );
+              }),
               const SizedBox(height: 24),
             ],
           ),

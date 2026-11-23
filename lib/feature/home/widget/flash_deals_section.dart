@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rescu/feature/home/widget/flash_deal_card.dart';
+import 'package:rescu/feature/shared_widget/deal_impression_tracker.dart';
 
 import '../../../model/deal_model.dart';
 
@@ -35,8 +36,11 @@ class FlashDealsSection extends StatelessWidget {
             itemCount: deals.length,
             itemBuilder: (context, index) {
               final deal = deals[index];
-              return FlashDealCard(
-                deal: deal,
+              return DealImpressionTracker(
+                id: deal.id,
+                position: index,
+                source: ImpressionSource.flashSaleSection,
+                child: FlashDealCard(deal: deal),
               );
             },
           ),

@@ -28,4 +28,11 @@ class AnalyticsService extends GetxService {
     events.add(event);
     LogService.log('analytics: $name $properties');
   }
+
+  void logDealImpression([Map<String, dynamic> properties = const {}]) {
+    final name = "deal_impression";
+    final event = AnalyticsEvent(name, properties);
+    events.add(event);
+    LogService.log('analytics: $name $properties');
+  }
 }
