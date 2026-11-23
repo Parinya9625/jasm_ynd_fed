@@ -99,3 +99,15 @@ When open deal detail page via deep link, `Get.arguments` does not contain a `De
 
 ### Solution
 In `deal_details_controller.dart` file, I updated `DealDetailsController.onInit()` method by extract initialization code into new  `_prepareDeal()` method with safe type checking. It will check if `Get.argumentns` is `DealModel`, use it directly and continue normal flow. Otherwise try to parse deal ID from `Get.parameters["id"]` and fetch deal data via `dealRepo.fetchById()` and use return result to display to user. And I also added loading state while fetching deal so user knows page is still loading and not broken.
+
+# Part B — Features
+
+## F-1 · Live flash-sale countdowns
+
+### Time Spent: ~7 hours
+
+### Implementation
+- Added `FlashSaleDealCountdown` widget to display countdown timer, based on the requirement: if the remaining timer is above an hour, I will show time with the format `hh:mm:ss`. Otherwise, it will use the `mm:ss` format. And when the timer is expired or hits `00:00`, then I will show the word "Expired" instead of time.
+- Added `CountdownController` to use internally with `FlashSaleDealCountdown` widget. It's a GetxController that stores time data and has methods to start and stop the timer.
+- In `FlashSaleDealCountdown` widget, it exposes an `.onExpired` callback that lets you hook a function that will trigger when the timer is expired. In this case, I hook it to update card state to preventing the user from tapping on it, and I hook it to a deal detail page to disable the checkout button.
+- In `My bag` page (`cart_screen.dart` file), I redesigned how this page works by separating items that can be checked out and expired items. When items can be checked out, they will display like the old design that this test gave. But when items are expired, they will move to a bottom section called "Expired Items". This section only contains all expired items and can't be increased/decreased, but instead it can only be removed by the user. The reason I designed it this way is because I want to let the user know which items they missed to check out before they expired, and not just vanish out of thin air. And when the user tries to checkout with "active" and "expired" items, only "active" items will get checked out and all "expired" items will still remain on screen, to let the user decide how they want to manage them.
