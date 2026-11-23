@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rescu/feature/shared_widget/deal_impression_tracker.dart';
 import 'package:rescu/feature/shared_widget/obx_preferred_size_widget.dart';
+import 'package:rescu/service/analytics_service.dart';
 
 import '../../app_config.dart';
 import '../../routes/routes.dart';

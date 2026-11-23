@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rescu/feature/home/widget/flash_deal_card.dart';
 import 'package:rescu/feature/shared_widget/deal_impression_tracker.dart';
+import 'package:rescu/service/analytics_service.dart';
 
 import '../../../model/deal_model.dart';
 

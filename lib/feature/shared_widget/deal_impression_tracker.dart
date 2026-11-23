@@ -5,17 +5,6 @@ import 'package:get/get.dart';
 import 'package:rescu/service/analytics_service.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-enum ImpressionSource {
-  home("home_feed"),
-  homePickToday("home_feed_pick_today"),
-  flashSaleSection("flash_rail"),
-  search("search"),
-  unknown("unknown");
-
-  const ImpressionSource(this.name);
-  final String name;
-}
-
 class DealImpressionTracker extends StatefulWidget {
   const DealImpressionTracker({
     super.key,
@@ -64,11 +53,13 @@ class _DealImpressionTrackerState extends State<DealImpressionTracker> {
     if (_timer != null) return;
 
     _timer = Timer(const Duration(seconds: 1), () {
-      Get.find<AnalyticsService>().logDealImpression({
-        "deal_id": widget.id,
-        "source": widget.source.name,
-        "position": widget.position,
-      });
+      Get.find<AnalyticsService>().logDealImpression(
+        DealImpressionEvent(
+          id: widget.id,
+          position: widget.position,
+          source: widget.source,
+        ),
+      );
     });
   }
 
