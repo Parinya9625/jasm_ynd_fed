@@ -119,3 +119,15 @@ In `deal_details_controller.dart` file, I updated `DealDetailsController.onInit(
 ### Implementation
 - Added `DealImpressionTracker` widget to wrap any deal widget and track its visibility. When visibility is 50% or more for 1 continuous second, it logs an analytic event via `AnalyticsService.logDealImpression()`.
 - In `AnalyticsService`, after `AnalyticsService.logDealImpression()` is called, it checks 2 conditions. First, if queued deal impression events are fewer than 10, a 15-second timer starts; once it reaches 15 seconds, it flushes the queued deal impressions and sends a batch to the API. Second, if queued deal impression events reach 10 or more (whether the timer is running or not), the service cancels the timer and sends a batch to the backend API (max 10 events per API call). After the API call succeeds, the sent items are removed from the queue while unsent items stay in the queue. If items remain, it checks the two conditions again until the queue is empty.
+
+## F-3 · Stock reservations with optimistic UI
+
+### Time Spent: 8 hours
+
+### Implementation
+- Added `ReservationCountdown` widget, with the same functionality as `FlashSaleDealCountdown` widget, just a different style.
+- Updated cart logic, when a user adds items to the bag, a reservation countdown starts for 5 minutes. When items expire, they move to a bottom section called "Expired Items" (similar to when a Flash Sale Deal expires), with a button to reserve again, restart the timer, and move them back to the top section ready for checkout with the same quantity.
+
+### Expiry Behavior & Product Justification
+- Instead of silently deleting expired items from the bag, I move them to the "Expired Items" section so the user doesn't lose their items without warning (especially if it expires right when they tap Checkout) and doesn't have to search for the deal again.
+- If an expired item is a flash sale deal, the user can still re-reserve it as long as the flash sale is still active, but once the flash sale ends, the re-reserve option is disabled.
