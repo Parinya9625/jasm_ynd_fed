@@ -14,6 +14,6 @@ class CartItemModel {
   num get lineTotal => deal.price * quantity;
 
   bool get isExpired {
-    return deal.isFlashSaleExpired;
+    return deal.isFlashSaleExpired || (reservation?.isExpired ?? false);
   }
 }

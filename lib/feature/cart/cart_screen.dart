@@ -39,7 +39,10 @@ class CartScreen extends GetView<CartController> {
                     onTapIncrease: () {
                       cart.add(item.deal);
                     },
-                    onExpired: () {
+                    onFlashSaleExpired: () {
+                      cart.refresh();
+                    },
+                    onReservedExpired: () {
                       cart.refresh();
                     },
                   );
