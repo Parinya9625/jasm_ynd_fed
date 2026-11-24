@@ -72,6 +72,15 @@ class CartScreen extends GetView<CartController> {
                           onTapDelete: () {
                             cart.remove(item.deal.id);
                           },
+                          onTapReReserve: () {
+                            cart.retryReserve(item);
+                          },
+                          onFlashSaleExpired: () {
+                            cart.refresh();
+                          },
+                          onReservedExpired: () {
+                            cart.refresh();
+                          },
                         );
                       },
                     ),

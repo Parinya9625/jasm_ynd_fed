@@ -4,25 +4,18 @@ import 'package:get/get.dart';
 
 class CountdownController extends GetxController {
   Timer? _timer;
+  Timer? _shortTimer;
   DateTime? _endAt;
   Function()? _onExpired;
-  Worker? _expiredWorker;
 
   final text = "00:00".obs;
-  final isExpired = true.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-
-    _expiredWorker = ever<bool>(isExpired, _onExpireUpdate);
-  }
+  final isExpired = false.obs;
 
   void start(DateTime endAt) {
     // NOTE: prevent restart if rebuild with same datetime
     if (_endAt == endAt && (_timer?.isActive ?? false)) return;
 
-    _timer?.cancel();
+    _cancelTimer();
     _endAt = endAt;
 
     final diff = endAt.difference(DateTime.now());
@@ -33,6 +26,16 @@ class CountdownController extends GetxController {
 
     _updateRemaining(diff);
 
+    // NOTE: handle short duration
+    _shortTimer = Timer(diff + const Duration(milliseconds: 20), () {
+      if (isClosed) return;
+      _cancelTimer();
+      _endAt = null;
+      _updateRemaining(Duration.zero);
+      _onExpired?.call();
+    });
+
+    if (diff <= const Duration(seconds: 1)) return;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (isClosed) {
         timer.cancel();
@@ -42,6 +45,7 @@ class CountdownController extends GetxController {
       final diff = endAt.difference(DateTime.now());
       if (diff <= Duration.zero) {
         stop();
+        _onExpired?.call();
       } else {
         _updateRemaining(diff);
       }
@@ -49,7 +53,7 @@ class CountdownController extends GetxController {
   }
 
   void stop() {
-    _timer?.cancel();
+    _cancelTimer();
     _updateRemaining(Duration.zero);
     _endAt = null;
   }
@@ -73,16 +77,16 @@ class CountdownController extends GetxController {
     text.value = "$m:$s";
   }
 
-  void _onExpireUpdate(bool isExpired) {
-    if (isExpired && !isClosed) {
-      _onExpired?.call();
-    }
+  void _cancelTimer() {
+    _timer?.cancel();
+    _timer = null;
+    _shortTimer?.cancel();
+    _shortTimer = null;
   }
 
   @override
   void onClose() {
-    _expiredWorker?.dispose();
-    _timer?.cancel();
+    _cancelTimer();
     super.onClose();
   }
 }

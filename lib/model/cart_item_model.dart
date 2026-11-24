@@ -16,4 +16,8 @@ class CartItemModel {
   bool get isExpired {
     return deal.isFlashSaleExpired || (reservation?.isExpired ?? false);
   }
+
+  bool get isFlashSaleExpired => deal.isFlashSaleExpired;
+
+  bool get isReservationExpired => reservation?.isExpired ?? false;
 }

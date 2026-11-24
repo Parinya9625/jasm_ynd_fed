@@ -13,6 +13,7 @@ class CartOrderCard extends StatefulWidget {
     this.onTapIncrease,
     this.onTapDecrease,
     this.onTapDelete,
+    this.onTapReReserve,
     this.onFlashSaleExpired,
     this.onReservedExpired,
   });
@@ -21,6 +22,7 @@ class CartOrderCard extends StatefulWidget {
   final VoidCallback? onTapIncrease;
   final VoidCallback? onTapDecrease;
   final VoidCallback? onTapDelete;
+  final VoidCallback? onTapReReserve;
   final VoidCallback? onFlashSaleExpired;
   final VoidCallback? onReservedExpired;
 
@@ -81,6 +83,20 @@ class _CartOrderCardState extends State<CartOrderCard> {
                 ),
                 Row(
                   children: [
+                    if (item.isReservationExpired &&
+                        (!item.isFlashSaleExpired || item.deal.flashSaleEndsAt == null)) ...[
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        icon: Badge(
+                          isLabelVisible: widget.onTapReReserve != null,
+                          offset: Offset(6, -6),
+                          label: Text(item.quantity.toString()),
+                          backgroundColor: AppConfig.primaryGreen,
+                          child: Icon(Icons.add_shopping_cart),
+                        ),
+                        onPressed: widget.onTapReReserve,
+                      ),
+                    ],
                     if (item.isExpired) ...[
                       IconButton(
                         visualDensity: VisualDensity.compact,

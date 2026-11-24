@@ -71,6 +71,22 @@ class CartService extends GetxService {
     updateReservation(existing);
   }
 
+  void retryReserve(CartItemModel item) {
+    final deal = item.deal;
+    if (deal.isFlashSaleExpired) return;
+
+    CartItemModel? existing = items.firstWhereOrNull((i) => i.deal.id == deal.id);
+    if (existing != null) {
+      existing.quantity = item.quantity;
+      items.refresh();
+    } else {
+      existing = CartItemModel(deal: deal, quantity: item.quantity);
+      items.add(existing);
+    }
+    _recount();
+    updateReservation(existing);
+  }
+
   void updateReservation(CartItemModel item) async {
     ReservationModel? reservation = item.reservation;
 
