@@ -111,3 +111,11 @@ In `deal_details_controller.dart` file, I updated `DealDetailsController.onInit(
 - Added `CountdownController` to use internally with `FlashSaleDealCountdown` widget. It's a GetxController that stores time data and has methods to start and stop the timer.
 - In `FlashSaleDealCountdown` widget, it exposes an `.onExpired` callback that lets you hook a function that will trigger when the timer is expired. In this case, I hook it to update card state to preventing the user from tapping on it, and I hook it to a deal detail page to disable the checkout button.
 - In `My bag` page (`cart_screen.dart` file), I redesigned how this page works by separating items that can be checked out and expired items. When items can be checked out, they will display like the old design that this test gave. But when items are expired, they will move to a bottom section called "Expired Items". This section only contains all expired items and can't be increased/decreased, but instead it can only be removed by the user. The reason I designed it this way is because I want to let the user know which items they missed to check out before they expired, and not just vanish out of thin air. And when the user tries to checkout with "active" and "expired" items, only "active" items will get checked out and all "expired" items will still remain on screen, to let the user decide how they want to manage them.
+
+## F-2 · Impression tracking
+
+### Time Spent: ~7 hours
+
+### Implementation
+- Added `DealImpressionTracker` widget to wrap any deal widget and track its visibility. When visibility is 50% or more for 1 continuous second, it logs an analytic event via `AnalyticsService.logDealImpression()`.
+- In `AnalyticsService`, after `AnalyticsService.logDealImpression()` is called, it checks 2 conditions. First, if queued deal impression events are fewer than 10, a 15-second timer starts; once it reaches 15 seconds, it flushes the queued deal impressions and sends a batch to the API. Second, if queued deal impression events reach 10 or more (whether the timer is running or not), the service cancels the timer and sends a batch to the backend API (max 10 events per API call). After the API call succeeds, the sent items are removed from the queue while unsent items stay in the queue. If items remain, it checks the two conditions again until the queue is empty.
